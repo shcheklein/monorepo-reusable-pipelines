@@ -1,0 +1,62 @@
+schema: '2.0'
+stages:
+  collect_data:
+    cmd:
+    - mkdir -p data/j/raw
+    - python ml/src/collect_data.py --target j --params pipeline_b_detect/j/params.yaml
+    deps:
+    - path: ml/src/collect_data.py
+      hash: md5
+      md5: 622a14e879e077e3ec7480459dcc4088
+      size: 1229
+    params:
+      pipeline_b_detect/j/params.yaml:
+        target: j
+    outs:
+    - path: data/j/raw/data.csv
+      hash: md5
+      md5: c78e7258db402a33ff5b72d4c1ac0b8e
+      size: 7023
+  process_data:
+    cmd:
+    - mkdir -p data/j/processed
+    - python ml/src/process_data.py --target j --params pipeline_b_detect/j/params.yaml
+    deps:
+    - path: data/j/raw/data.csv
+      hash: md5
+      md5: c78e7258db402a33ff5b72d4c1ac0b8e
+      size: 7023
+    - path: ml/src/process_data.py
+      hash: md5
+      md5: 52b38150b3d1a9d87001eddb33c21f81
+      size: 925
+    params:
+      pipeline_b_detect/j/params.yaml:
+        target: j
+    outs:
+    - path: data/j/processed/data.csv
+      hash: md5
+      md5: c78e7258db402a33ff5b72d4c1ac0b8e
+      size: 7023
+  train:
+    cmd: python ml/src/train.py --type pipeline_b_detect --target j --params pipeline_b_detect/j/params.yaml
+    deps:
+    - path: data/j/processed/data.csv
+      hash: md5
+      md5: c78e7258db402a33ff5b72d4c1ac0b8e
+      size: 7023
+    - path: ml/src/train.py
+      hash: md5
+      md5: db3846d63e74681eab2922ca69436ea6
+      size: 1289
+    params:
+      pipeline_b_detect/j/params.yaml:
+        train:
+          epochs: 30
+          batch_size: 16
+          learning_rate: 0.01
+    outs:
+    - path: pipeline_b_detect/j/models/model_pipeline_b_detect_j.file
+      hash: md5
+      md5: 6f5c391522a3c06b02e6830b696321f2
+      size: 6599

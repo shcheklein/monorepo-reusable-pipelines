@@ -1,0 +1,42 @@
+stages:
+  collect_data:
+    cmd: 
+    - mkdir -p ${data_dir}/${target}/raw
+    - python ml/src/collect_data.py --target ${target} --params pipeline_a_segment/${target}/params.yaml
+    wdir: ../../
+    params:
+      - pipeline_a_segment/${target}/params.yaml:
+        - target
+    deps:
+      - ml/src/collect_data.py
+    outs:
+      - ${data_dir}/${target}/raw/data.csv:
+          cache: false
+  
+  process_data:
+    cmd: 
+    - mkdir -p ${data_dir}/${target}/processed
+    - python ml/src/process_data.py --target ${target} --params pipeline_a_segment/${target}/params.yaml
+    wdir: ../../
+    params:
+      - pipeline_a_segment/${target}/params.yaml:
+        - target
+    deps:
+      - ml/src/process_data.py
+      - ${data_dir}/${target}/raw/data.csv
+    outs:
+      - ${data_dir}/${target}/processed/data.csv:
+          cache: false
+  
+  train:
+    cmd: python ml/src/train.py --type pipeline_a_segment --target ${target} --params pipeline_a_segment/${target}/params.yaml
+    wdir: ../../
+    params:
+      - pipeline_a_segment/${target}/params.yaml:
+        - train
+    deps:
+      - ml/src/train.py
+      - ${data_dir}/${target}/processed/data.csv
+    outs:
+      - pipeline_a_segment/${target}/${model_dir}/model_pipeline_a_segment_${target}.file:
+          cache: false

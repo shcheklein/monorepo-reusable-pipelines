@@ -1,0 +1,11 @@
+project: pipeline_a_segment
+target: z
+data_dir: data/a_segment
+model_dir: models
+result_dir: results
+
+train: 
+  epochs: 30
+  batch_size: 16
+  learning_rate: 0.01
+  

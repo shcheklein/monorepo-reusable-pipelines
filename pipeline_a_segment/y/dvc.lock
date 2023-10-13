@@ -1,0 +1,62 @@
+schema: '2.0'
+stages:
+  collect_data:
+    cmd:
+    - mkdir -p data/a_segment/y/raw
+    - python ml/src/collect_data.py --target y --params pipeline_a_segment/y/params.yaml
+    deps:
+    - path: ml/src/collect_data.py
+      hash: md5
+      md5: 622a14e879e077e3ec7480459dcc4088
+      size: 1229
+    params:
+      pipeline_a_segment/y/params.yaml:
+        target: y
+    outs:
+    - path: data/a_segment/y/raw/data.csv
+      hash: md5
+      md5: c2f96397e6591c8ebb0102064e0d4d78
+      size: 7968
+  process_data:
+    cmd:
+    - mkdir -p data/a_segment/y/processed
+    - python ml/src/process_data.py --target y --params pipeline_a_segment/y/params.yaml
+    deps:
+    - path: data/a_segment/y/raw/data.csv
+      hash: md5
+      md5: c2f96397e6591c8ebb0102064e0d4d78
+      size: 7968
+    - path: ml/src/process_data.py
+      hash: md5
+      md5: 52b38150b3d1a9d87001eddb33c21f81
+      size: 925
+    params:
+      pipeline_a_segment/y/params.yaml:
+        target: y
+    outs:
+    - path: data/a_segment/y/processed/data.csv
+      hash: md5
+      md5: c2f96397e6591c8ebb0102064e0d4d78
+      size: 7968
+  train:
+    cmd: python ml/src/train.py --type pipeline_a_segment --target y --params pipeline_a_segment/y/params.yaml
+    deps:
+    - path: data/a_segment/y/processed/data.csv
+      hash: md5
+      md5: c2f96397e6591c8ebb0102064e0d4d78
+      size: 7968
+    - path: ml/src/train.py
+      hash: md5
+      md5: db3846d63e74681eab2922ca69436ea6
+      size: 1289
+    params:
+      pipeline_a_segment/y/params.yaml:
+        train:
+          epochs: 15
+          batch_size: 64
+          learning_rate: 0.003
+    outs:
+    - path: pipeline_a_segment/y/models/model_pipeline_a_segment_y.file
+      hash: md5
+      md5: 9693c3c07bfd889e1bf7cf38342bc058
+      size: 7484
